@@ -1,5 +1,15 @@
 import { isLess, CompareFunc } from '../lib/comparators';
 
+/*
+  Characteristics:
+    - in-place
+    - time complexity:
+        worst: O(n log n)
+        best: O(n log n)
+        average: O(n log n)
+    - space complexity: O(n)
+*/
+
 interface Options {
   bottomUp: boolean;
 }
@@ -51,13 +61,11 @@ export const createSorter = <T>(
     const N = sortable.length;
     const aux = new Array(N);
 
-    for (let size = 1; size < N; size = size + size) {
-      for (let lo = 0; lo < N - size; lo += size + size) {
-        const mid = lo + size + 1;
+    for (let size = 1; size < N; size = 2 * size) {
+      for (let lo = 0; lo < N - size; lo += 2 * size) {
+        const mid = lo + size - 1;
         const hi = Math.min(lo + 2 * size - 1, N - 1);
-        console.log('merging', lo, mid, hi);
         merge(sortable, aux, lo, mid, hi);
-        console.log(sortable);
       }
     }
 

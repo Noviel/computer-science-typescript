@@ -6,8 +6,8 @@ import { CompareFunc, isLess } from '../lib/comparators';
     - in-place
     - time complexity:
         worst: O(n^2) comparisons | O(n) swaps
-        best O(n^2) comparisons | O(n) swaps
-        average O(n^2) comparisons | O(n) swaps
+        best: O(n^2) comparisons | O(n) swaps
+        average: O(n^2) comparisons | O(n) swaps
     - space complexity: O(1)
 */
 

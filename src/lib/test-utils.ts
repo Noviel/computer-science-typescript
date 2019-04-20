@@ -17,8 +17,8 @@ export function testDefaultCases(sorter: SortFunc<number>) {
   });
 }
 
-export function testCustomComparator<T>(sortFunc: SortFunc<T>, comparable: T[]) {
+export function testCustomComparator<T>(sortFunc: SortFunc<T>, comparable: T[], expected: T[]) {
   it('should sort with custom compare function', () => {
-    expect(sortFunc(comparable)).toEqual([{ value: -2 }, { value: 0 }, { value: 2 }]);
+    expect(sortFunc(comparable)).toEqual(expected);
   });
 }

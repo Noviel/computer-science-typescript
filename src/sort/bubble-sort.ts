@@ -8,8 +8,8 @@ import { SortFunc } from './types';
     - in-place
     - time complexity:
         worst: O(n^2)
-        best O(n)
-        average O(n^2)
+        best: O(n)
+        average: O(n^2)
     - space complexity: O(1)
 */
 
