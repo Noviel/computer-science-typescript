@@ -1,9 +1,6 @@
 import { swap } from '../lib/swap';
 import { intHalf } from '../lib/int';
-
-function less<T>(comparables: T[], i: number, j: number) {
-  return comparables[i] < comparables[j];
-}
+import { CompareFunc, isLess } from '../lib/comparators';
 
 /*
   Priority queue based on binary heap
@@ -12,10 +9,12 @@ function less<T>(comparables: T[], i: number, j: number) {
 class MaxPriorityQueue<T> {
   private pq: T[];
   private N: number;
+  private compare: CompareFunc<T>;
 
-  constructor(capacity: number) {
+  constructor(capacity: number, compare: CompareFunc<T> = isLess) {
     this.pq = new Array(capacity + 1);
     this.N = 0;
+    this.compare = compare;
   }
 
   isEmpty() {
@@ -28,8 +27,9 @@ class MaxPriorityQueue<T> {
   }
 
   swim(k: number) {
+    const { compare, pq } = this;
     let halfK = intHalf(k);
-    while (k > 1 && less(this.pq, halfK, k)) {
+    while (k > 1 && compare(pq[halfK], pq[k])) {
       swap(this.pq, k, halfK);
       k = halfK;
       halfK = intHalf(k);
@@ -37,12 +37,13 @@ class MaxPriorityQueue<T> {
   }
 
   sink(k: number) {
+    const { compare, pq } = this;
     while (2 * k <= this.N) {
       let j = 2 * k;
-      if (j < this.N && less(this.pq, j, j + 1)) {
+      if (j < this.N && compare(pq[j], pq[j + 1])) {
         j++;
       }
-      if (!less(this.pq, k, j)) {
+      if (!compare(pq[k], pq[j])) {
         break;
       }
       swap(this.pq, k, j);
