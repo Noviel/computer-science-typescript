@@ -1,5 +1,4 @@
-import { SortFunc, CreateSorterFunc } from '../sort/types';
-import { CompareFunc } from './comparators';
+import { SortFunc } from '../sort/types';
 
 export function testDefaultCases(sorter: SortFunc<number>) {
   it('should "sort" an empty array', () => {
