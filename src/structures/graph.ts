@@ -118,3 +118,43 @@ export function depthFirstSearch(graph: UnidirectionalGraph, v: number) {
 
   return { marked, count };
 }
+
+export function depthFirstPaths(graph: UnidirectionalGraph, source: number) {
+  const isMarked: boolean[] = Array.from({ length: graph.verticesCount }, _ => false);
+
+  const edgeTo: number[] = [];
+
+  const validate = (v: number) => validateVertex(v, isMarked.length);
+
+  const dfs = (graph: UnidirectionalGraph, v: number) => {
+    isMarked[v] = true;
+    for (let w of Object.values(graph.adjacentTo(v))) {
+      if (!isMarked[w]) {
+        edgeTo[w] = v;
+        dfs(graph, w);
+      }
+    }
+  };
+
+  validate(source);
+  dfs(graph, source);
+
+  return {
+    hasPathTo: (v: number) => {
+      validate(v);
+      return isMarked[v];
+    },
+    pathTo(v: number) {
+      validate(v);
+      if (!this.hasPathTo(v)) {
+        return null;
+      }
+      const path: number[] = [];
+      for (let x = v; x !== source; x = edgeTo[x]) {
+        path.push(x);
+      }
+      path.push(source);
+      return path.reverse();
+    },
+  };
+}
