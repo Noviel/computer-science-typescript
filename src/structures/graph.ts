@@ -125,7 +125,7 @@ const createDFS = (graph: UnidirectionalGraph, hooks: SearchHooks) => {
   };
 };
 
-export function depthFirstSearch(graph: UnidirectionalGraph, v: number) {
+export function depthFirstSearch(graph: UnidirectionalGraph, origin: number) {
   let count = 0;
 
   const { search, hasPathTo: marked } = createDFS(graph, {
@@ -134,7 +134,7 @@ export function depthFirstSearch(graph: UnidirectionalGraph, v: number) {
     },
   });
 
-  search(v);
+  search(origin);
 
   return { marked, count };
 }
@@ -152,14 +152,14 @@ export function depthFirstPaths(graph: UnidirectionalGraph, origin: number) {
 
   return {
     hasPathTo,
-    pathTo(v: number) {
-      validate(v);
-      if (!this.hasPathTo(v)) {
+    pathTo(target: number) {
+      validate(target);
+      if (!this.hasPathTo(target)) {
         return null;
       }
       const path: number[] = [];
-      for (let x = v; x !== origin; x = edgeTo[x]) {
-        path.push(x);
+      for (let v = target; v !== origin; v = edgeTo[v]) {
+        path.push(v);
       }
       path.push(origin);
       return path.reverse();
