@@ -93,7 +93,7 @@ export class UnidirectionalGraph {
 }
 
 export function depthFirstSearch(graph: UnidirectionalGraph, v: number) {
-  const isMarked: boolean[] = new Array(graph.verticesCount);
+  const isMarked: boolean[] = Array.from({ length: graph.verticesCount }, _ => false);
   /* count of connected vertices */
   let count = 0;
 
