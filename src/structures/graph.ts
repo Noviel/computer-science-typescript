@@ -92,68 +92,76 @@ export class UnidirectionalGraph {
   }
 }
 
-export function depthFirstSearch(graph: UnidirectionalGraph, v: number) {
-  const isMarked: boolean[] = Array.from({ length: graph.verticesCount }, _ => false);
-  /* count of connected vertices */
-  let count = 0;
+interface SearchHooks {
+  onMark?(v: number, w: number): void;
+  onEnter?(v: number): void;
+}
 
+const createDFS = (graph: UnidirectionalGraph, hooks: SearchHooks) => {
+  const isMarked: boolean[] = Array.from({ length: graph.verticesCount }, _ => false);
   const validate = (v: number) => validateVertex(v, isMarked.length);
 
-  const marked = (v: number) => {
-    validate(v);
-    return isMarked[v];
-  };
-
   const dfs = (graph: UnidirectionalGraph, v: number) => {
-    count++;
+    hooks.onEnter && hooks.onEnter(v);
     isMarked[v] = true;
     for (let w of Object.values(graph.adjacentTo(v))) {
       if (!isMarked[w]) {
+        hooks.onMark && hooks.onMark(v, w);
         dfs(graph, w);
       }
     }
   };
 
-  dfs(graph, v);
+  return {
+    validate,
+    hasPathTo(v: number) {
+      validate(v);
+      return isMarked[v];
+    },
+    search(v: number) {
+      validate(v);
+      return dfs(graph, v);
+    },
+  };
+};
+
+export function depthFirstSearch(graph: UnidirectionalGraph, v: number) {
+  let count = 0;
+
+  const { search, hasPathTo: marked } = createDFS(graph, {
+    onEnter() {
+      count++;
+    },
+  });
+
+  search(v);
 
   return { marked, count };
 }
 
-export function depthFirstPaths(graph: UnidirectionalGraph, source: number) {
-  const isMarked: boolean[] = Array.from({ length: graph.verticesCount }, _ => false);
-
+export function depthFirstPaths(graph: UnidirectionalGraph, origin: number) {
   const edgeTo: number[] = [];
 
-  const validate = (v: number) => validateVertex(v, isMarked.length);
+  const { hasPathTo, search, validate } = createDFS(graph, {
+    onMark(current, adjacent) {
+      edgeTo[adjacent] = current;
+    },
+  });
 
-  const dfs = (graph: UnidirectionalGraph, v: number) => {
-    isMarked[v] = true;
-    for (let w of Object.values(graph.adjacentTo(v))) {
-      if (!isMarked[w]) {
-        edgeTo[w] = v;
-        dfs(graph, w);
-      }
-    }
-  };
-
-  validate(source);
-  dfs(graph, source);
+  search(origin);
 
   return {
-    hasPathTo: (v: number) => {
-      validate(v);
-      return isMarked[v];
-    },
+    hasPathTo,
     pathTo(v: number) {
       validate(v);
       if (!this.hasPathTo(v)) {
         return null;
       }
       const path: number[] = [];
-      for (let x = v; x !== source; x = edgeTo[x]) {
+      for (let x = v; x !== origin; x = edgeTo[x]) {
         path.push(x);
       }
-      path.push(source);
+      path.push(origin);
       return path.reverse();
     },
   };
